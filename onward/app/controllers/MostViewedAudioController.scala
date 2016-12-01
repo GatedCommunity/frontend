@@ -4,12 +4,13 @@ import common._
 import feed.MostViewedAudioAgent
 import layout.{CollectionEssentials, FaciaContainer}
 import model.pressed.CollectionConfig
-import model.{RelatedContentItem, Cached, FrontProperties}
+import model.{Cached, FrontProperties, RelatedContentItem}
+import play.api.Environment
 import play.api.mvc.{Action, Controller, RequestHeader}
 import services.CollectionConfigWithId
 import slices.{Fixed, FixedContainers}
 
-class MostViewedAudioController(mostViewedAudioAgent: MostViewedAudioAgent) extends Controller with Logging with ExecutionContexts {
+class MostViewedAudioController(mostViewedAudioAgent: MostViewedAudioAgent)(implicit env: Environment) extends Controller with Logging with ExecutionContexts {
   def renderMostViewed() = Action { implicit request =>
     getMostViewedAudio match {
       case Nil => Cached(60) { JsonNotFound() }
@@ -47,7 +48,7 @@ class MostViewedAudioController(mostViewedAudioAgent: MostViewedAudioAgent) exte
         CollectionEssentials(audios.map(_.faciaContent) take 4, Nil, displayName, None, None, None)
       ).withTimeStamps,
       FrontProperties.empty
-    )(request)
+    )(request, env)
 
     JsonComponent(html)
   }

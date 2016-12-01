@@ -1,6 +1,5 @@
 package app
 
-import akka.actor.ActorSystem
 import common._
 import model.ApplicationIdentity
 import play.api.ApplicationLoader.Context

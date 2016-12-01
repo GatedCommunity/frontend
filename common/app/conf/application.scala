@@ -1,10 +1,18 @@
 package conf
 
-object Configuration extends common.GuardianConfiguration
-object Static extends common.Assets.Assets(Configuration.assets.path, "assets/assets.map")
-object Atomise extends common.Assets.CssMap("assets/atomic-class-map.json")
+import common.GuardianConfiguration
+import common.Assets.{Assets, CssMap}
+import play.api.Environment
+
+trait EnvironmentHelper {
+  implicit val env: Environment
+}
+
+object Configuration extends GuardianConfiguration
+object Static extends Assets(Configuration.assets.path, "assets/assets.map") with EnvironmentHelper
+object Atomise extends CssMap("assets/atomic-class-map.json") with EnvironmentHelper
 object DiscussionAsset {
-  def apply(assetName: String):String = {
+  def apply(assetName: String): String = {
     assets.DiscussionAssetsMap.getURL(assetName)
   }
 }

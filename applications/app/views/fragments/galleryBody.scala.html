@@ -6,7 +6,7 @@
 @import views.support.`package`.Seq2zipWithRowInfo
 @import views.support.{GalleryCaptionCleaner, RenderClasses}
 
-@(page: GalleryPage)(implicit request: RequestHeader)
+@(page: GalleryPage)(implicit request: RequestHeader, env: play.api.Environment)
 
 <div class="l-side-margins l-side-margins--media l-side-margins--gallery">
 

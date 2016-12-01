@@ -10,6 +10,7 @@ import layout.{CollectionEssentials, DescriptionMetaHeader, FaciaContainer}
 import model.Cached.WithoutRevalidationResult
 import model._
 import model.pressed.CollectionConfig
+import play.api.Environment
 import play.api.libs.json.{JsArray, Json}
 import play.api.mvc.{Action, Controller, RequestHeader}
 import services.CollectionConfigWithId
@@ -26,7 +27,7 @@ case class Series(id: String, tag: Tag, trails: RelatedContent) {
  }
 }
 
-class SeriesController(contentApiClient: ContentApiClient) extends Controller with Logging with Paging with ExecutionContexts with Requests {
+class SeriesController(contentApiClient: ContentApiClient)(implicit env: Environment) extends Controller with Logging with Paging with ExecutionContexts with Requests {
   def renderSeriesStories(seriesId: String) = Action.async { implicit request =>
     lookup(Edition(request), seriesId) map { series =>
       series.map(renderSeriesTrails).getOrElse(NotFound)
@@ -105,7 +106,7 @@ class SeriesController(contentApiClient: ContentApiClient) extends Controller wi
       ).withTimeStamps
        .copy(customHeader = header),
       properties
-    )(request)
+    )(request, env)
 
     renderFormat(response, response, 900)
   }

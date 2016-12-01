@@ -12,7 +12,7 @@
   isPaidFront: Boolean = false,
   maybeContainerModel: Option[ContainerModel] = None,
   showFrontBranding: Boolean = false
-  )(implicit request: RequestHeader)
+  )(implicit request: RequestHeader, env: play.api.Environment)
 
 @defining((containerDefinition.displayName, containerDefinition.faciaComponentName)) { case (title, componentName) =>
     @containerDefinition.customHeader.map {

@@ -1,20 +1,21 @@
 package common.Assets
 
+import play.api.Mode.Dev
 import common.{Logging, RelativePathEscaper}
 import conf.Configuration
 import org.apache.commons.io.IOUtils
 import play.api.libs.json._
-import play.api.{Mode, Play}
+import play.api.Environment
 
-import scala.collection.concurrent.{Map => ConcurrentMap, TrieMap}
+import scala.collection.concurrent.{TrieMap, Map => ConcurrentMap}
 import scala.util.{Failure, Success, Try}
 
 // turns an unhashed name into a name that's hashed if it needs to be
 class Assets(base: String, mapResource: String, useHashedBundles: Boolean = Configuration.assets.useHashedBundles) extends Logging {
 
-  lazy val lookup: Map[String, String] = Get(assetMap(mapResource))
+  def lookup(implicit env: Environment): Map[String, String] = Get(assetMap(mapResource))
 
-  def apply(path: String): String = {
+  def apply(path: String)(implicit env: Environment): String = {
     val target =
       if (useHashedBundles) {
         lookup.getOrElse(path, throw AssetNotFoundException(path))
@@ -30,7 +31,7 @@ class Assets(base: String, mapResource: String, useHashedBundles: Boolean = Conf
       case JsError(errors) => Failure(new Exception(s"$errors"))
     }
 
-  def assetMap(resourceName: String): Try[Map[String, String]] = {
+  def assetMap(resourceName: String)(implicit env: Environment): Try[Map[String, String]] = {
     for {
       rawResource <- LoadFromClasspath(resourceName)
       mappings <- jsonToAssetMap(rawResource)
@@ -40,7 +41,7 @@ class Assets(base: String, mapResource: String, useHashedBundles: Boolean = Conf
 }
 
 // turns a readable CSS class into a list of rules in short form from the atomic css file
-class CssMap(mapResource: String) extends Logging {
+class CssMap(mapResource: String)(implicit env: Environment) extends Logging {
 
   lazy val lookup: Map[String, List[String]] = Get(cssMap(mapResource))
 
@@ -67,7 +68,7 @@ object inlineSvg {
 
   private val memoizedSvg: ConcurrentMap[String, Try[String]] = TrieMap()
 
-  def apply(path: String): String =
+  def apply(path: String)(implicit env: Environment): String =
     Get(memoizedSvg.getOrElseUpdate(path, LoadFromClasspath(s"assets/inline-svgs/$path")))
 
 }
@@ -76,20 +77,19 @@ object css {
 
   private val memoizedCss: ConcurrentMap[String, Try[String]] = TrieMap()
 
-  def head(projectOverride: Option[String]) = inline(cssHead(projectOverride.getOrElse(Configuration.environment.projectName)))
-  def inlineStoryPackage = inline("story-package")
-  def atomic = inline("atomic")
-  def inlineExplore = inline("article-explore")
-  def amp = inline("head.amp")
+  def head(projectOverride: Option[String])(implicit env: Environment) = inline(cssHead(projectOverride.getOrElse(Configuration.environment.projectName)))
+  def inlineStoryPackage(implicit env: Environment) = inline("story-package")
+  def atomic(implicit env: Environment) = inline("atomic")
+  def inlineExplore(implicit env: Environment) = inline("article-explore")
+  def amp(implicit env: Environment) = inline("head.amp")
 
   def projectCss(projectOverride: Option[String]) = project(projectOverride.getOrElse(Configuration.environment.projectName))
   def headOldIE(projectOverride: Option[String]) = cssOldIE(projectOverride.getOrElse(Configuration.environment.projectName))
   def headIE9(projectOverride: Option[String]) = cssIE9(projectOverride.getOrElse(Configuration.environment.projectName))
 
-
-  private def inline(module: String): String = {
+  private def inline(module: String)(implicit env: Environment): String = {
     val resourceName = s"assets/inline-stylesheets/$module.css"
-    Get(if (Play.current.mode == Mode.Dev) {
+    Get(if (env.mode == Dev) {
       LoadFromClasspath(resourceName)
     } else {
       memoizedCss.getOrElseUpdate(resourceName, LoadFromClasspath(resourceName))
@@ -139,7 +139,7 @@ object css {
 }
 
 object js {
-  val curl: String = Get(LoadFromClasspath("assets/curl-domReady.js").map(RelativePathEscaper.escapeLeadingDotPaths))
+  def curl(implicit env: Environment): String = Get(LoadFromClasspath("assets/curl-domReady.js").map(RelativePathEscaper.escapeLeadingDotPaths))
 }
 
 object Get {
@@ -151,8 +151,8 @@ object Get {
 
 // gets the asset url from the classpath
 object LoadFromClasspath {
-  def apply(assetPath: String): Try[String] = {
-    (Option(Play.classloader(Play.current).getResource(assetPath)) match {
+  def apply(assetPath: String)(implicit env: Environment): Try[String] = {
+    (Option(env.classLoader.getResource(assetPath)) match {
       case Some(s) => Success(s)
       case None => Failure(AssetNotFoundException(assetPath))
     }).flatMap { url =>

@@ -1,4 +1,4 @@
-@(page: model.Page, mainPicture: String, ctaImage: Option[String], brandColour: String)(implicit request: RequestHeader)
+@(page: model.Page, mainPicture: String, ctaImage: Option[String], brandColour: String)(implicit request: RequestHeader, env: play.api.Environment)
 
 @import common.Edition
 @import common.commercial.PaidContent

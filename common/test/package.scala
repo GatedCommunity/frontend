@@ -1,6 +1,7 @@
 package test
 
 import java.io.File
+
 import com.gargoylesoftware.htmlunit.html.HtmlPage
 import com.gargoylesoftware.htmlunit.{BrowserVersion, Page, WebClient, WebResponse}
 import common.{ExecutionContexts, Lazy}
@@ -13,6 +14,7 @@ import play.api.libs.ws.WSClient
 import play.api.libs.ws.ning.{NingWSClient, NingWSClientConfig}
 import play.api.test._
 import recorder.ContentApiHttpRecorder
+
 import scala.util.{Failure, Success, Try}
 
 //TODO: to delete once ContentApiClient global object is not used anymore

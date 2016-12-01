@@ -13,6 +13,7 @@ import common.Seqs._
 import org.joda.time.LocalDate
 import football.views.html.matchList.matchesComponent
 import football.views.html.tablesList.tablesComponent
+import play.api.Environment
 
 import scalaz.syntax.std.boolean._
 
@@ -36,7 +37,7 @@ class CompetitionAndGroupFinder(competitions: Competitions) {
 
 case class CompetitionAndGroup(competition: Competition, group: Group)
 
-class FixturesAndResults(competitions: Competitions) extends Football {
+class FixturesAndResults(competitions: Competitions)(implicit env: Environment) extends Football {
 
   lazy val competitionAndGroupFinder = new CompetitionAndGroupFinder(competitions)
   lazy val teamNameBuilder = new TeamNameBuilder(competitions)
