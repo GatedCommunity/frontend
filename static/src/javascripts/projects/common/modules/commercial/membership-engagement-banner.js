@@ -66,7 +66,7 @@ define([
         };
 
         function doInternationalTest(content) {
-            var variant = getVariant('MembershipEngagementInternationalExperiment');
+            var variant = getVariantIdFor('MembershipEngagementInternationalExperiment');
             if (variant && variant !== notInTest) {
                 var campaignCode = 'gdnwb_copts_mem_banner_ROWbanner__' + variant;
                 content.campaignCode = campaignCode;
@@ -75,7 +75,7 @@ define([
         }
 
         function doUkCopyTest(content) {
-            var variant = getVariant('UkMembEngagementMsgCopyTest10');
+            var variant = getVariantIdFor('UkMembEngagementMsgCopyTest10');
             if (variant && variant !== notInTest) {
                 var variantMessages = {
                         post_truth_world: 'In a post-truth world, facts matter more than ever. Support the Guardian for £5 a month',
@@ -93,7 +93,7 @@ define([
         }
 
         function doAuCopyTest(content) {
-            var variant = getVariant('AuMembEngagementMsgCopyTest8');
+            var variant = getVariantIdFor('AuMembEngagementMsgCopyTest8');
             if (variant && variant !== notInTest) {
                 var variantMessages = {
                     fearless_10: 'We need you to help support our fearless independent journalism. Become a Guardian Australia member for just $10 a month',
@@ -118,6 +118,13 @@ define([
                 buttonCaption: message.buttonCaption,
                 colourClass: thisInstanceColour(),
                 arrowWhiteRight: svgs('arrowWhiteRight')
+            };
+
+            var userVariant = MembershipEngagementBannerTests.find(new function(test) {
+                var userVariantId = getVariantIdFor(test.id);
+                if (userVariantId) { // user is in a variant for this test
+                    return test.variants.find(new function(variant) { variant.id = userVariantId });
+                }
             };
 
             doInternationalTest(content);
@@ -159,7 +166,7 @@ define([
 
         function userHasMadeEnoughVisits(edition) {
             if (edition === 'INT') {
-                var internationalTestVariant = getVariant('MembershipEngagementInternationalExperiment');
+                var internationalTestVariant = getVariantIdFor('MembershipEngagementInternationalExperiment');
                 if (internationalTestVariant == '1st_article')
                     return true;
             }
@@ -177,8 +184,8 @@ define([
             return colours[storage.local.get('gu.alreadyVisited') % colours.length];
         }
 
-        function getVariant(variantName) {
-            return ab.testCanBeRun(variantName) ? ab.getTestVariantId(variantName) : undefined;
+        function getVariantIdFor(testName) {
+            return ab.testCanBeRun(testName) ? ab.getTestVariantId(testName) : undefined;
         }
 
         return {
