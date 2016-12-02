@@ -4,8 +4,6 @@ define([
     'common/utils/config',
     'common/utils/storage',
     'common/utils/template',
-    'common/modules/ui/message',
-    'text!common/views/membership-message.html',
     'common/modules/commercial/commercial-features',
     'common/modules/commercial/user-features',
     'common/utils/mediator'
@@ -15,13 +13,11 @@ define([
     config,
     storage,
     template,
-    Message,
-    messageTemplate,
     commercialFeatures,
     userFeatures,
     mediator
 ) {
-    var EditionTest = function (edition) {
+    var EditionTest = function (edition, campaignPrefix) {
 
         this.edition = edition;
         this.id = 'MembershipEngagementBanner'+edition[0].toUpperCase() + edition.substr(1);
@@ -37,17 +33,18 @@ define([
         this.dataLinkNames = '';
         this.idealOutcome = '';
 
-        var minVisited= 10;
-
         // Required by the A/B testing framework - can not be async, unfortunately
         this.canRun = function () {
             var matchesEdition = config.page.edition.toLowerCase() == edition;
-            return matchesEdition && commercialFeatures.syncMembershipMessages &&
-                minVisited <= (storage.local.get('gu.alreadyVisited') || 0);
+            return matchesEdition && commercialFeatures.canReasonablyAskForMoney;
         };
 
         this.completer = function (complete) {
             mediator.on('membership-message:display', function () {
+                /* When the button link is clicked, call the function that indicates the A/B test is 'complete'
+                 * ...note that for Membership & Contributions this completion is only the start of a longer
+                 * journey that will hopefully end pages later with the user giving us money.
+                 */
                 bean.on(qwery('#membership__engagement-message-link')[0], 'click', complete);
             });
         };
@@ -60,38 +57,20 @@ define([
     EditionTest.prototype.addMessageVariant = function (id, variantParams, linkHref, cssModifierClass) {
         var self = this;
 
-        // extract messageText from variantParams
         this.variants.push({
             id: id,
-            test: function () {
-                // async check to see if user has an ad-blocker enabled
-                commercialFeatures.async.membershipMessages.then(function (canShow) {
-                    if (canShow && self.canRun()) {
-                        var renderedBanner = template(messageTemplate, { messageText: messageText, linkHref: linkHref });
-                        var messageShown = new Message(
-                            'engagement-banner-2016-09-08', // change this to redisplay banners to everyone who has previously closed them
-                            {
-                                pinOnHide: false,
-                                siteMessageLinkName: 'membership message',
-                                siteMessageCloseBtn: 'hide',
-                                siteMessageComponentName: id,
-                                trackDisplay: true,
-                                cssModifierClass: cssModifierClass
-                            }).show(renderedBanner);
-                        if (messageShown) {
-                            mediator.emit('membership-message:display');
-                        }
-                        mediator.emit('banner-message:complete');
-                    }
-                });
-            },
+            variantParams: variantParams,
+            /*  We don't want to run any 'code' in this test, we just want a variant to be selected. All message display
+             * is performed in membership-engagement-banner.js, modifying the banner using the data in variantParams.
+             */
+            test: function () {},
             success: this.completer
         });
         return this;
     };
 
     EditionTest.prototype.addMembershipVariant = function (suffix, variantParams) {
-        var id = 'mem_' + this.edition + '_banner_' + suffix;
+        var id = campaignPrefix + suffix;
 
         var colours = ['default','vibrant-blue','yellow','light-blue','deep-purple','teal'];
 
@@ -103,7 +82,7 @@ define([
     };
 
     EditionTest.prototype.addContributionsVariant = function (suffix, variantParams) {
-        var id = 'co_' + this.edition + '_banner_' + suffix;
+        var id = campaignPrefix + suffix;
         return this.addMessageVariant(id, variantParams, 'https://contribute.theguardian.com/'+this.edition+'?INTCMP='+id, 'contributions-message');
     };
 

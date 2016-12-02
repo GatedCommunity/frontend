@@ -12,6 +12,7 @@ define([
         'Promise',
         'common/utils/fastdom-promise',
         'common/modules/experiments/ab',
+        'common/modules/experiments/tests/membership-engagement-banner-tests',
         'common/utils/$',
         'lodash/objects/defaults',
         'common/views/svgs'
@@ -28,6 +29,7 @@ define([
                  Promise,
                  fastdom,
                  ab,
+                 MembershipEngagementBannerTests,
                  $,
                  defaults,
                  svgs) {
@@ -50,36 +52,58 @@ define([
             minArticles: 10
         };
 
-        var messages = {
-            UK: {
-                campaign: 'mem_uk_banner',
-                messageText: 'For less than the price of a coffee a week, you could help secure the Guardian’s future. Support our journalism for £5 a month.',
-                buttonCaption: 'Become a Supporter'
+        var requiredParams = [
+            minArticles, // how many articles should the user see before they get the engagement banner?
+            messageText,
+            colourStrategy, // a function to determine what css class to use for the banner's colour
+            buttonCaption
+        ];
+
+        var baseParams = {
+            membership: {
+                buttonCaption: 'Become a Supporter',
+                colourStrategy: function() {
+                    var colours = ['yellow', 'purple', 'bright-blue', 'dark-blue'];
+                    // Rotate through different colours on successive page views
+                    return 'membership-message-' + colours[storage.local.get('gu.alreadyVisited') % colours.length];
+                }
             },
-            US: {
-                campaign: 'mem_us_banner',
-                messageText: 'If you use it, if you like it, then why not pay for it? It’s only fair.',
-                buttonCaption: 'Make a Contribution'
+            contributions: {
+                buttonCaption: 'Make a Contribution',
+                colourStrategy: function() { return 'contributions-message'; }
+            }
+        };
+
+        var editionParams = {
+            uk: {
+                membership: {
+                    messageText: 'For less than the price of a coffee a week, you could help secure the Guardian’s future. Support our journalism for £5 a month.'
+                }
             },
-            AU: {
-                campaign: 'mem_au_banner',
-                messageText: 'We need you to help support our fearless independent journalism. Become a Guardian Australia Member for just $100 a year.',
-                buttonCaption: 'Become a Supporter'
+            au: {
+                membership: {
+                    messageText: 'We need you to help support our fearless independent journalism. Become a Guardian Australia Member for just $100 a year.'
+                }
             },
-            INT: {
-                campaign: 'mem_int_banner',
-                messageText: 'The Guardian’s voice is needed now more than ever. Support our journalism for just $69/€49 per year.',
-                buttonCaption: 'Become a Supporter'
+            us: {
+                contributions: {
+                    messageText: 'If you use it, if you like it, then why not pay for it? It’s only fair.'
+                }
+            },
+            int: {
+                membership: {
+                    messageText: 'The Guardian’s voice is needed now more than ever. Support our journalism for just $69/€49 per year.'
+                }
             }
         };
 
 
         function show(edition, message) {
+            var paramsForEdition = editionParams[edition];
+            
+
             var content = {
-                linkHref: formatEndpointUrl(edition, message.campaign),
-                messageText: message.messageText,
                 campaignCode: message.campaign,
-                buttonCaption: message.buttonCaption,
                 colourClass: thisInstanceColour(),
                 arrowWhiteRight: svgs('arrowWhiteRight')
             };
@@ -95,10 +119,12 @@ define([
 
             var bannerParams = defaults({ minArticles: 10 }, bannerParamsSources);
 
+            var campaignCode = "";
+
             var renderedBanner = template(messageTemplate, {
                 linkHref: formatEndpointUrl(edition, message.campaign),
                 messageText: bannerParams.messageText,
-                campaignCode: message.campaign,
+                campaignCode: campaignCode,
                 buttonCaption: bannerParams.buttonCaption
             });
 
@@ -108,7 +134,7 @@ define([
                     pinOnHide: false,
                     siteMessageLinkName: 'membership message',
                     siteMessageCloseBtn: 'hide',
-                    siteMessageComponentName: content.campaignCode,
+                    siteMessageComponentName: campaignCode,
                     trackDisplay: true,
                     cssModifierClass: 'membership-prominent ' + content.colourClass
                 }).show(renderedBanner);
