@@ -1,4 +1,4 @@
-@(item: layout.ContentCard, containerIndex: Int, index: Int, visibilityDataAttribute: String, isFirstContainer: Boolean, isList: Boolean)(implicit request: RequestHeader)
+@(item: layout.ContentCard, containerIndex: Int, index: Int, visibilityDataAttribute: String, isFirstContainer: Boolean, isList: Boolean)(implicit request: RequestHeader, env: play.api.Environment)
 
 @import layout.{FaciaWidths, FrontendLatestSnap}
 @import model.{CrosswordSvg, InlineImage, InlineSlideshow, InlineVideo, VideoPlayer}

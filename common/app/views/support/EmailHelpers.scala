@@ -1,8 +1,10 @@
 package views.support
 
+import common.Strings./
 import conf.Static
 import model._
 import model.pressed.PressedContent
+import play.api.Environment
 import play.twirl.api.Html
 
 object EmailHelpers {
@@ -32,7 +34,7 @@ object EmailHelpers {
   def paddedRow(inner: Html): Html = row(columns(12, Seq("panel"))(inner))
   def paddedRow(classes: Seq[String] = Seq.empty)(inner: Html): Html = row(columns(12, classes ++ Seq("panel"))(inner))
 
-  def imageUrlFromPressedContent(pressedContent: PressedContent): Option[String] = {
+  def imageUrlFromPressedContent(pressedContent: PressedContent)(implicit env: Environment): Option[String] = {
     for {
       InlineImage(imageMedia) <- InlineImage.fromFaciaContent(pressedContent)
       url <- FrontEmailImage.bestFor(imageMedia)
@@ -49,7 +51,7 @@ object EmailHelpers {
     case p: PressedPage => p.frontProperties.onPageDescription
   }
 
-  def icon(name: String) = Html {
+  def icon(name: String)(implicit env: Environment) = Html {
     s"""<img src="${Static(s"images/email/icons/$name.png")}" class="icon icon-$name">"""
   }
 
@@ -57,13 +59,13 @@ object EmailHelpers {
     s"""<img width="580" class="full-width" src="$src" ${alt.map(alt => s"""alt="$alt"""").getOrElse("")}>"""
   }
 
-  def imgFromPressedContent(pressedContent: PressedContent) = imageUrlFromPressedContent(pressedContent).map { url =>
+  def imgFromPressedContent(pressedContent: PressedContent)(implicit env: Environment) = imageUrlFromPressedContent(pressedContent).map { url =>
     img(src = url, alt = Some(pressedContent.header.headline))
   }
 
   object Images {
-    val footerG = Static("images/email/grey-g.png")
-    val quote = Static("images/email/quote.png")
-    val play = Static("images/email/icons/play.png")
+    def footerG(implicit env: Environment) = Static("images/email/grey-g.png")
+    def quote(implicit env: Environment) = Static("images/email/quote.png")
+    def play(implicit env: Environment) = Static("images/email/icons/play.png")
   }
 }

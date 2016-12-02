@@ -1,4 +1,4 @@
-@(slice: layout.SliceWithCards, containerIndex: Int)(implicit request: RequestHeader)
+@(slice: layout.SliceWithCards, containerIndex: Int)(implicit request: RequestHeader, env: play.api.Environment)
 
 @import layout.{ColumnAndCards, SingleItem, Rows, SplitColumn, MPU}
 @import views.html.fragments.items.facia_cards.item

@@ -6,7 +6,7 @@
   pagePaths: PagePaths,
   actionClass: Option[String] = None,
   showFull: Boolean = true,
-  ariaContext: Option[String] = None)(implicit request: RequestHeader)
+  ariaContext: Option[String] = None)(implicit request: RequestHeader, env: play.api.Environment)
 
 @paginated(pageNum: Int) = {@common.LinkTo(pagePaths.pathFor(pageNum))}
 @paginationPointer(pageNo: Option[Int], dir: String) = {

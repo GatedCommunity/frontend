@@ -2,6 +2,7 @@ package common.commercial
 
 import common.Edition
 import model.facia.PressedCollection
+import play.api.Environment
 
 case class ContainerModel(
                            id: String,
@@ -22,7 +23,7 @@ case class ContainerContent(
 
 object ContainerModel {
 
-  def fromPressedCollection(edition: Edition)(collection: PressedCollection): ContainerModel = {
+  def fromPressedCollection(edition: Edition)(collection: PressedCollection)(implicit env: Environment): ContainerModel = {
 
     val cards = collection.curatedPlusBackfillDeduplicated map CardContent.fromPressedContent(edition)
     val layoutName = collection.collectionType

@@ -11,6 +11,7 @@ import model._
 import model.meta.{ItemList, ListItem}
 import model.pressed._
 import org.joda.time.{DateTime, DateTimeZone}
+import play.api.Environment
 import play.api.mvc.RequestHeader
 import slices.{ContainerDefinition, Fixed, FixedContainers}
 
@@ -174,7 +175,7 @@ object IndexPage {
 
 }
 object IndexPageItem {
-  def apply(content: ApiContent): IndexPageItem = {
+  def apply(content: ApiContent)(implicit env: Environment): IndexPageItem = {
     IndexPageItem(
       Content(content),
       FaciaContentConvert.contentToFaciaContent(content))

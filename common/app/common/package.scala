@@ -69,7 +69,7 @@ object `package` extends implicits.Strings with implicits.Requests with play.api
         RevalidatableResult.Ok(htmlResponse())
     }
 
-  def renderFormat(htmlResponse: () => Html, jsonResponse: () => Html, page: model.Page, switches: Seq[Switch])(implicit request: RequestHeader) =
+  def renderFormat(htmlResponse: () => Html, jsonResponse: () => Html, page: model.Page, switches: Seq[Switch])(implicit request: RequestHeader, env: Environment) =
     Cached(page) {
       if (request.isJson)
         JsonComponent(page, jsonResponse())

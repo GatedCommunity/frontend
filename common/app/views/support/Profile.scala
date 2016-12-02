@@ -2,13 +2,16 @@ package views.support
 
 import java.net.{URI, URISyntaxException}
 import java.util.Base64
+
 import common.Logging
-import conf.switches.Switches.{ImageServerSwitch, FacebookShareImageLogoOverlay, TwitterShareImageLogoOverlay}
+import conf.switches.Switches.{FacebookShareImageLogoOverlay, ImageServerSwitch, TwitterShareImageLogoOverlay}
 import conf.Configuration
 import layout.{BreakpointWidth, WidthsByBreakpoint}
 import model._
 import org.apache.commons.math3.fraction.Fraction
 import org.apache.commons.math3.util.Precision
+import play.api.Environment
+
 import Function.const
 
 sealed trait ElementProfile {
@@ -29,7 +32,7 @@ sealed trait ElementProfile {
 
   def largestFor(image: ImageMedia): Option[ImageAsset] = image.largestImage
 
-  def bestFor(image: ImageMedia): Option[String] =
+  def bestFor(image: ImageMedia)(implicit env: Environment): Option[String] =
     elementFor(image).flatMap(_.url).map{ url => ImgSrc(url, this) }
 
   def captionFor(image: ImageMedia): Option[String] =
@@ -53,7 +56,7 @@ sealed trait ElementProfile {
   val heightParam = height.map(pixels => s"h=$pixels").getOrElse("")
   val widthParam = width.map(pixels => s"w=$pixels").getOrElse("")
 
-  def resizeString = {
+  def resizeString(implicit env: Environment) = {
     val params = Seq(widthParam, heightParam, qualityparam, autoParam, sharpParam, fitParam, dprParam).filter(_.nonEmpty).mkString("&")
     s"?$params"
   }
@@ -108,7 +111,7 @@ abstract class ShareImage(shouldIncludeOverlay: Boolean) extends Profile(width =
   val blendOffsetParam = "ba=bottom%2Cleft"
   val blendImageParam: String
 
-  override def resizeString = {
+  override def resizeString(implicit env: Environment) = {
     if(shouldIncludeOverlay) {
       val params = Seq(widthParam, heightParam, qualityparam, autoParam, sharpParam, fitParam, dprParam, blendModeParam, blendOffsetParam, blendImageParam).filter(_.nonEmpty).mkString("&")
       s"?$params"
@@ -135,9 +138,9 @@ object EmailVideoImage extends Profile(width = Some(580), autoFormat = false) {
   override val qualityparam = "q=40"
   val blendModeParam = "bm=normal"
   val blendOffsetParam = "ba=center"
-  val blendImageParam = s"blend64=${Base64.getUrlEncoder.encodeToString(EmailHelpers.Images.play.getBytes)}"
+  def blendImageParam(implicit env: Environment) = s"blend64=${Base64.getUrlEncoder.encodeToString(EmailHelpers.Images.play.getBytes)}"
 
-  override def resizeString = {
+  override def resizeString(implicit env: Environment) = {
     val params = Seq(widthParam, heightParam, qualityparam, autoParam, sharpParam, fitParam, dprParam, blendModeParam, blendOffsetParam, blendImageParam).filter(_.nonEmpty).mkString("&")
     s"?$params"
   }
@@ -170,7 +173,7 @@ object ImgSrc extends Logging with implicits.Strings {
 
   private val supportedImages = Set(".jpg", ".jpeg", ".png")
 
-  def apply(url: String, imageType: ElementProfile): String = {
+  def apply(url: String, imageType: ElementProfile)(implicit env: Environment): String = {
     try {
       val uri = new URI(url.trim.encodeURI)
       val isSupportedImage = supportedImages.exists(extension => uri.getPath.toLowerCase.endsWith(extension))
@@ -189,23 +192,24 @@ object ImgSrc extends Logging with implicits.Strings {
     }
   }
 
-  def findNearestSrc(ImageElement: ImageMedia, profile: Profile): Option[String] = {
+  def findNearestSrc(ImageElement: ImageMedia, profile: Profile)(implicit env: Environment): Option[String] = {
     profile.elementFor(ImageElement).flatMap(_.url).map{ largestImage =>
       ImgSrc(largestImage, profile)
     }
   }
 
-  private def findLargestSrc(ImageElement: ImageMedia, profile: Profile): Option[String] = {
+  private def findLargestSrc(ImageElement: ImageMedia, profile: Profile)(implicit env: Environment): Option[String] = {
     profile.largestFor(ImageElement).flatMap(_.url).map{ largestImage =>
       ImgSrc(largestImage, profile)
     }
   }
 
-  def srcset(imageContainer: ImageMedia, widths: WidthsByBreakpoint): String = {
+  def srcset(imageContainer: ImageMedia, widths: WidthsByBreakpoint)(implicit env: Environment): String = {
     widths.profiles.map { profile => srcsetForProfile(profile, imageContainer, hidpi = false) } mkString ", "
   }
 
-  def srcsetForBreakpoint(breakpointWidth: BreakpointWidth, breakpointWidths: Seq[BreakpointWidth], maybePath: Option[String] = None, maybeImageMedia: Option[ImageMedia] = None, hidpi: Boolean = false) = {
+  def srcsetForBreakpoint(breakpointWidth: BreakpointWidth, breakpointWidths: Seq[BreakpointWidth],
+                          maybePath: Option[String] = None, maybeImageMedia: Option[ImageMedia] = None, hidpi: Boolean = false)(implicit env: Environment) = {
     val isPng = maybePath.exists(path => path.toLowerCase.endsWith("png"))
     breakpointWidth.toPixels(breakpointWidths)
       .map(browserWidth => Profile(width = Some(browserWidth), hidpi = hidpi, isPng = isPng))
@@ -218,7 +222,7 @@ object ImgSrc extends Logging with implicits.Strings {
       .mkString(", ")
   }
 
-  def srcsetForProfile(profile: Profile, imageContainer: ImageMedia, hidpi: Boolean): String = {
+  def srcsetForProfile(profile: Profile, imageContainer: ImageMedia, hidpi: Boolean)(implicit env: Environment): String = {
     if(ImageServerSwitch.isSwitchedOn) {
       s"${findLargestSrc(imageContainer, profile).get} ${profile.width.get * (if (hidpi) 2 else 1)}w"
     } else {
@@ -226,11 +230,11 @@ object ImgSrc extends Logging with implicits.Strings {
     }
   }
 
-  def srcsetForProfile(profile: Profile, path: String, hidpi: Boolean): String = {
+  def srcsetForProfile(profile: Profile, path: String, hidpi: Boolean)(implicit env: Environment): String = {
     s"${ImgSrc(path, profile)} ${profile.width.get * (if (hidpi) 2 else 1)}w"
   }
 
-  def getFallbackUrl(ImageElement: ImageMedia): Option[String] = {
+  def getFallbackUrl(ImageElement: ImageMedia)(implicit env: Environment): Option[String] = {
     if(ImageServerSwitch.isSwitchedOn) {
       findLargestSrc(ImageElement, Item300)
     } else {
@@ -238,7 +242,7 @@ object ImgSrc extends Logging with implicits.Strings {
     }
   }
 
-  def getAmpImageUrl(ImageElement: ImageMedia): Option[String] = {
+  def getAmpImageUrl(ImageElement: ImageMedia)(implicit env: Environment): Option[String] = {
     findNearestSrc(ImageElement, Item620)
   }
 
@@ -248,7 +252,7 @@ object ImgSrc extends Logging with implicits.Strings {
 }
 
 object SeoThumbnail {
-  def apply(page: Page): Option[String] = page match {
+  def apply(page: Page)(implicit env: Environment): Option[String] = page match {
     case content: ContentPage => content.item.elements.thumbnail.flatMap(thumbnail => Item620.bestFor(thumbnail.images))
     case _ => None
   }

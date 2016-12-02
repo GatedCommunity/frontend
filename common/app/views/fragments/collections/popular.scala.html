@@ -1,4 +1,4 @@
-@(popular: Seq[model.MostPopular], containerDefinition: Option[layout.FaciaContainer] = None)(implicit request: RequestHeader)
+@(popular: Seq[model.MostPopular], containerDefinition: Option[layout.FaciaContainer] = None)(implicit request: RequestHeader, env: play.api.Environment)
 @import common.Localisation
 @import layout.FaciaCardHeader
 @import views.html.fragments.items.elements.facia_cards.title

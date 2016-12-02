@@ -1,11 +1,12 @@
 package services
 
-import common.{ExecutionContexts, Edition}
-import conf.Configuration
+import common.{Edition, ExecutionContexts}
+import conf.{Configuration, Static}
 import contentapi.ContentApiClient
 import model.Content
-import org.joda.time.{DateTimeZone, DateTime}
+import org.joda.time.{DateTime, DateTimeZone}
 import implicits.Dates.DateTime2ToCommonDateFormats
+
 import scala.concurrent.Future
 import scala.xml.NodeSeq
 

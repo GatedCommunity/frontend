@@ -7,7 +7,7 @@
 @(containerDefinition: layout.FaciaContainer,
   frontProperties: model.FrontProperties,
   maybeContainerModel: Option[ContainerModel],
-  showFrontBranding: Boolean)(implicit request: RequestHeader)
+  showFrontBranding: Boolean)(implicit request: RequestHeader, env: play.api.Environment)
 
 @containerHeader(containerDefinition, frontProperties)
 

@@ -5,6 +5,7 @@ import com.gu.contentapi.client.model.v1.{Asset, Content, Element}
 import common.Logging
 import common.commercial.hosted.hardcoded.{HostedPages, NextHostedPage}
 import model.MetaData
+import play.api.Environment
 
 case class HostedGalleryPage(
   override val id: String,
@@ -24,7 +25,7 @@ case class HostedGalleryPage(
 
   override val imageUrl = images.headOption.map(_.url).getOrElse("")
 
-  def nextPages: List[NextHostedPage] = nextPagesList ++ nextPageNames.flatMap(
+  def nextPages(implicit env: Environment): List[NextHostedPage] = nextPagesList ++ nextPageNames.flatMap(
     HostedPages.fromCampaignAndPageName(campaign.id, _)
   ).map(
     page => NextHostedPage(

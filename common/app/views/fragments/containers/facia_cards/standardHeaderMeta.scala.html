@@ -1,4 +1,4 @@
-@(containerDefinition: layout.FaciaContainer, frontProperties: model.FrontProperties)(implicit request: RequestHeader)
+@(containerDefinition: layout.FaciaContainer, frontProperties: model.FrontProperties)(implicit request: RequestHeader, env: play.api.Environment)
 
 @import common.{LinkTo, Localisation}
 @import views.html.fragments.containers.facia_cards.{date, latestUpdate}

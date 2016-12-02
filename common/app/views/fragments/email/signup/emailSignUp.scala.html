@@ -4,7 +4,7 @@
     formDescription: String = "",
     labelText: String = "Email address",
     submitText: String = "Sign up",
-    formImage: String = "")(implicit request: RequestHeader)
+    formImage: String = "")(implicit request: RequestHeader, env: play.api.Environment)
 
 @import common.LinkTo
 @import controllers.ListIds._

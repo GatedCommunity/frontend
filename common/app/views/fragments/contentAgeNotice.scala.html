@@ -1,4 +1,4 @@
-@(ageMessage: String)(implicit request: RequestHeader)
+@(ageMessage: String)(implicit request: RequestHeader, env: play.api.Environment)
 
 @if(ageMessage.nonEmpty) {
     <div class="old-article-message">

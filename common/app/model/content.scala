@@ -17,6 +17,7 @@ import model.pressed._
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
 import org.scala_tools.time.Imports._
+import play.api.Environment
 import play.api.libs.json._
 import views.support._
 
@@ -111,12 +112,12 @@ final case class Content(
   lazy val showCircularBylinePicAtSide: Boolean =
     cardStyle == Feature && tags.hasLargeContributorImage && tags.contributors.length == 1
 
-  lazy val signedArticleImage: String = {
+  def signedArticleImage(implicit env: Environment): String = {
     ImgSrc(rawOpenGraphImage, EmailImage)
   }
 
   // read this before modifying: https://developers.facebook.com/docs/opengraph/howtos/maximizing-distribution-media-content#images
-  lazy val openGraphImage: String = {
+  def openGraphImage(implicit env: Environment): String = {
     if (isAdvertisementFeature && FacebookShareImageLogoOverlay.isSwitchedOn) {
       ImgSrc(rawOpenGraphImage, Item700)
     } else {
@@ -125,7 +126,7 @@ final case class Content(
   }
 
   // URL of image to use in the twitter card. Image must be less than 1MB in size: https://dev.twitter.com/cards/overview
-  lazy val twitterCardImage: String = {
+  def twitterCardImage(implicit env: Environment): String = {
     if (isAdvertisementFeature && TwitterShareImageLogoOverlay.isSwitchedOn) {
       ImgSrc(rawOpenGraphImage, Item700)
     } else {
@@ -299,13 +300,13 @@ final case class Content(
     meta.flatten.toMap
   }
 
-  val opengraphProperties = Map(
+  def opengraphProperties(implicit env: Environment) = Map(
     "og:title" -> metadata.webTitle,
     "og:description" -> fields.trailText.map(StripHtmlTagsAndUnescapeEntities(_)).getOrElse(""),
     "og:image" -> openGraphImage
   )
 
-  val twitterProperties = Map(
+  def twitterProperties(implicit env: Environment) = Map(
     "twitter:app:url:googleplay" -> metadata.webUrl.replaceFirst("^[a-zA-Z]*://", "guardian://"), //replace current scheme with guardian mobile app scheme
     "twitter:image" -> twitterCardImage
   ) ++ contributorTwitterHandle.map(handle => "twitter:creator" -> s"@$handle").toList
@@ -316,7 +317,7 @@ final case class Content(
 
 object Content {
 
-  def apply(apiContent: contentapi.Content): ContentType = {
+  def apply(apiContent: contentapi.Content)(implicit env: Environment): ContentType = {
     val content = make(apiContent)
 
     apiContent match {
@@ -329,7 +330,7 @@ object Content {
     }
   }
 
-  def make(apiContent: contentapi.Content): Content = {
+  def make(apiContent: contentapi.Content)(implicit env: Environment): Content = {
     val fields = Fields.make(apiContent)
     val metadata = MetaData.make(fields, apiContent)
     val elements = Elements.make(apiContent)
@@ -411,7 +412,7 @@ object Article {
       hasInlineMerchandise = content.isbn.isDefined || content.commercial.hasInlineMerchandise)
   }
 
-  private def copyMetaData(content: Content, commercial: Commercial, lightbox: GenericLightbox, trail: Trail, tags: Tags) = {
+  private def copyMetaData(content: Content, commercial: Commercial, lightbox: GenericLightbox, trail: Trail, tags: Tags)(implicit env: Environment) = {
 
     val contentType = if (content.tags.isLiveBlog) GuardianContentTypes.LiveBlog else GuardianContentTypes.Article
     val section = content.metadata.sectionId
@@ -467,7 +468,7 @@ object Article {
   }
 
   // Perform a copy of the content object to enable Article to override Content.
-  def make(content: Content): Article = {
+  def make(content: Content)(implicit env: Environment): Article = {
 
     val fields = content.fields
     val elements = content.elements
@@ -626,7 +627,7 @@ final case class Video (
 }
 
 object Gallery {
-  def make(content: Content): Gallery = {
+  def make(content: Content)(implicit env: Environment): Gallery = {
 
     val contentType = GuardianContentTypes.Gallery
     val fields = content.fields
@@ -722,13 +723,13 @@ case class GalleryLightbox(
 
   val galleryImages: Seq[ImageElement] = elements.images.filter(_.properties.isGallery)
   val largestCrops: Seq[ImageAsset] = galleryImages.flatMap(_.images.largestImage)
-  val openGraphImages: Seq[String] = largestCrops.flatMap(_.url).map(ImgSrc(_, FacebookOpenGraphImage))
+  def openGraphImages(implicit env: Environment): Seq[String] = largestCrops.flatMap(_.url).map(ImgSrc(_, FacebookOpenGraphImage))
   val size = galleryImages.size
   val landscapes = largestCrops.filter(i => i.width > i.height).sortBy(_.index)
   val portraits = largestCrops.filter(i => i.width < i.height).sortBy(_.index)
   val isInPicturesSeries = tags.tags.exists(_.id == "lifeandstyle/series/in-pictures")
 
-  val javascriptConfig: JsObject = {
+  def javascriptConfig(implicit env: Environment): JsObject = {
     val imageJson = for {
       container <- galleryImages
       img <- container.images.largestEditorialCrop
@@ -777,7 +778,7 @@ case class GenericLightbox(
 
   lazy val isMainMediaLightboxable = mainFiltered.nonEmpty
 
-  lazy val javascriptConfig: JsObject = {
+  def javascriptConfig(implicit env: Environment): JsObject = {
     val imageJson = for {
       container <- lightboxImages
       img <- container.images.largestEditorialCrop
@@ -821,7 +822,7 @@ final case class Interactive(
 }
 
 object Interactive {
-  def make(apiContent: contentapi.Content): Interactive = {
+  def make(apiContent: contentapi.Content)(implicit env: Environment): Interactive = {
     val content = Content(apiContent).content
     val contentType = GuardianContentTypes.Interactive
     val fields = content.fields
@@ -848,7 +849,7 @@ object Interactive {
 }
 
 object ImageContent {
-  def make(content: Content): ImageContent = {
+  def make(content: Content)(implicit env: Environment): ImageContent = {
     val contentType = GuardianContentTypes.ImageContent
     val fields = content.fields
     val section = content.metadata.sectionId
@@ -886,7 +887,7 @@ final case class ImageContent(
 }
 
 object CrosswordContent {
-  def make(crossword: CrosswordData, apicontent: contentapi.Content) = {
+  def make(crossword: CrosswordData, apicontent: contentapi.Content)(implicit env: Environment) = {
 
     val content = Content(apicontent)
     val contentType= GuardianContentTypes.Crossword

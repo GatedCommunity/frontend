@@ -1,4 +1,4 @@
-@(rating: Int)(implicit request: RequestHeader)
+@(rating: Int)(implicit request: RequestHeader, env: play.api.Environment)
 
 <div class="stars" role="presentation">
     @List(1,2,3,4,5).map{ i =>

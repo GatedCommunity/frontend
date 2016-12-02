@@ -1,4 +1,4 @@
-@(name: String, modifier: Option[String] = None, isActive: Boolean = false, isClientSideTemplate: Boolean = false)(content: Html)
+@(name: String, modifier: Option[String] = None, isActive: Boolean = false, isClientSideTemplate: Boolean = false, content: Html)(implicit env: play.api.Environment)
 
 @defining("dropdown-"+content.hashCode){ hash =>
 <div class="dropdown dropdown-styled u-cf @modifier.map("dropdown--" + _) @if(isActive){dropdown--active}">

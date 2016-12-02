@@ -2,7 +2,7 @@
   omnitureId: String,
   optAdvertClassNames: Option[Seq[String]] = None,
   optClassNames: Option[Seq[String]] = None,
-  useCardBranding: Boolean)(implicit request: RequestHeader)
+  useCardBranding: Boolean)(implicit request: RequestHeader, env: play.api.Environment)
 
 @import views.html.fragments.commercial.cardLogo
 @import views.html.fragments.inlineSvg

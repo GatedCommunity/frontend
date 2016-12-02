@@ -1,4 +1,4 @@
-@(item: model.Page)(implicit request: RequestHeader)
+@(item: model.Page)(implicit request: RequestHeader, env: play.api.Environment)
 @import common.{Edition, StringEncodings}
 @import conf.Static
 @import play.api.libs.json.Json

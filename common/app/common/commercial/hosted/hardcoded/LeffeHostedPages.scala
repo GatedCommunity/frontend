@@ -3,6 +3,7 @@ package common.commercial.hosted.hardcoded
 import common.commercial.{Dimensions, Logo}
 import common.commercial.hosted._
 import conf.Static
+import play.api.Environment
 
 object LeffeHostedPages {
 
@@ -12,7 +13,7 @@ object LeffeHostedPages {
   private val susanDergesPageName = "susan-derges"
   private val quayBrothersPageName = "quay-brothers"
 
-  private val campaign = HostedCampaign(
+  private def campaign(implicit env: Environment) = HostedCampaign(
     id = "leffe-rediscover-time",
     name = "Leffe - Rediscover Time",
     owner = "Leffe",
@@ -23,7 +24,7 @@ object LeffeHostedPages {
     fontColour = Colour("#dec190")
   )
 
-  private val cta = HostedCallToAction(
+  private def cta(implicit env: Environment) = HostedCallToAction(
     url = "https://www.facebook.com/Leffe.uk/",
     label = Some("Rediscover Time"),
     image = Some(Static("images/commercial/leffe_banner.png")),
@@ -33,7 +34,7 @@ object LeffeHostedPages {
 
   private val videoSrcRoot = "https://cdn.theguardian.tv/interactive"
 
-  private val willardWiganPageWithoutNextPage: HostedVideoPage = {
+  private def willardWiganPageWithoutNextPage(implicit env: Environment): HostedVideoPage = {
     val id = s"advertiser-content/${campaign.id}/$willardWiganPageName"
     val pageName = willardWiganPageName
     val standfirst = "Leffe presents a film about micro-sculptor Willard Wigan, who slows down his own heartbeat to " +
@@ -77,7 +78,7 @@ object LeffeHostedPages {
     )
   }
 
-  private val adrienneTreebyPageWithoutNextPage: HostedVideoPage = {
+  private def adrienneTreebyPageWithoutNextPage(implicit env: Environment): HostedVideoPage = {
     val id = s"advertiser-content/${campaign.id}/$adrienneTreebyPageName"
     val pageName = adrienneTreebyPageName
     val standfirst = "Leffe presents a film about charcuterie producer Adrienne E. Treeby, who uses centuries-old " +
@@ -121,7 +122,7 @@ object LeffeHostedPages {
     )
   }
 
-  private val peteLawrencePageWithoutNextPage: HostedVideoPage = {
+  private def peteLawrencePageWithoutNextPage(implicit env: Environment): HostedVideoPage = {
     val id = s"advertiser-content/${campaign.id}/$peteLawrencePageName"
     val pageName = peteLawrencePageName
     val standfirst = "Leffe presents a film featuring astronomical observer Pete Lawrence as he literally rediscovers" +
@@ -167,7 +168,7 @@ object LeffeHostedPages {
     )
   }
 
-  private val susanDergesPageWithoutNextPage: HostedVideoPage = {
+  private def susanDergesPageWithoutNextPage(implicit env: Environment): HostedVideoPage = {
     val id = s"advertiser-content/${campaign.id}/$susanDergesPageName"
     val pageName = susanDergesPageName
     val standfirst = "Leffe presents a film about artist Susan Derges, who specialises in creating unique camera-less" +
@@ -211,7 +212,7 @@ object LeffeHostedPages {
     )
   }
 
-  private val quayBrothersPageWithoutNextPage: HostedVideoPage = {
+  private def quayBrothersPageWithoutNextPage(implicit env: Environment): HostedVideoPage = {
     val id = s"advertiser-content/${campaign.id}/$quayBrothersPageName"
     val pageName = quayBrothersPageName
     val standfirst = "Leffe presents a film featuring influential stop-frame animators, Stephen and Timothy Quay, who" +
@@ -267,17 +268,17 @@ object LeffeHostedPages {
     hostedPage.copy(nextPage = nextPage, nextVideo = nextPage)
   }
 
-  private lazy val willardWiganPage = withNextPage(willardWiganPageWithoutNextPage, adrienneTreebyPageWithoutNextPage)
+  private def willardWiganPage(implicit env: Environment) = withNextPage(willardWiganPageWithoutNextPage, adrienneTreebyPageWithoutNextPage)
 
-  private lazy val adrienneTreebyPage = withNextPage(adrienneTreebyPageWithoutNextPage, peteLawrencePageWithoutNextPage)
+  private def adrienneTreebyPage(implicit env: Environment) = withNextPage(adrienneTreebyPageWithoutNextPage, peteLawrencePageWithoutNextPage)
 
-  private lazy val peteLawrencePage = withNextPage(peteLawrencePageWithoutNextPage, susanDergesPageWithoutNextPage)
+  private def peteLawrencePage(implicit env: Environment) = withNextPage(peteLawrencePageWithoutNextPage, susanDergesPageWithoutNextPage)
 
-  private lazy val susanDergesPage = withNextPage(susanDergesPageWithoutNextPage, quayBrothersPageWithoutNextPage)
+  private def susanDergesPage(implicit env: Environment) = withNextPage(susanDergesPageWithoutNextPage, quayBrothersPageWithoutNextPage)
 
-  private lazy val quayBrothersPage = withNextPage(quayBrothersPageWithoutNextPage, willardWiganPageWithoutNextPage)
+  private def quayBrothersPage(implicit env: Environment) = withNextPage(quayBrothersPageWithoutNextPage, willardWiganPageWithoutNextPage)
 
-  def fromPageName(pageName: String): Option[HostedPage] = {
+  def fromPageName(pageName: String)(implicit env: Environment): Option[HostedPage] = {
     pageName match {
       case `willardWiganPageName` => Some(willardWiganPage)
       case `adrienneTreebyPageName` => Some(adrienneTreebyPage)

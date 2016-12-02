@@ -13,6 +13,8 @@ import conf.switches.Switches.CircuitBreakerSwitch
 import model.{Content, Trail}
 import org.joda.time.DateTime
 import org.scala_tools.time.Implicits._
+import play.api.Environment
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.{Duration, MILLISECONDS}
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,7 +47,7 @@ object QueryDefaults extends implicits.Collections {
   val leadContentMaxAge = 1.day
 
   object EditorsPicsOrLeadContentAndLatest {
-    def apply(result: Future[ItemResponse]): Future[Seq[Trail]] =
+    def apply(result: Future[ItemResponse])(implicit env: Environment): Future[Seq[Trail]] =
       result.map { r =>
         val leadContentCutOff = DateTime.now.toLocalDate - leadContentMaxAge
 

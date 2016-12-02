@@ -3,7 +3,7 @@
 @import views.support.ContributorLinks
 @import views.support.TrailCssClasses.toneClass
 
-@(page: ContentPage)(implicit request: RequestHeader)
+@(page: ContentPage)(implicit request: RequestHeader, env: play.api.Environment)
 
 <div class="content content--immersive tonal tonal--@toneClass(page.item) immersive-main-media">
 

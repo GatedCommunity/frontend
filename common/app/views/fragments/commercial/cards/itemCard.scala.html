@@ -11,7 +11,7 @@
   optAdvertClassNames: Option[Seq[String]] = None,
   optClassNames: Option[Seq[String]] = None,
   optImgRatio: Option[String] = None,
-  useCardBranding: Boolean)(implicit request: RequestHeader)
+  useCardBranding: Boolean)(implicit request: RequestHeader, env: play.api.Environment)
 
 <div class="@CssClassBuilder.advertContainer(optClassNames)">
     <a href="@item.targetUrl"

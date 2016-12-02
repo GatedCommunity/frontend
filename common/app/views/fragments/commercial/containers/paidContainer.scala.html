@@ -1,6 +1,6 @@
 @(frontId: String,
   containerIndex: Int,
-  containerModel: common.commercial.ContainerModel)(implicit request: RequestHeader)
+  containerModel: common.commercial.ContainerModel)(implicit request: RequestHeader, env: play.api.Environment)
 
 @import common.LinkTo
 @import views.html.fragments.commercial.containerWrapper

@@ -3,6 +3,7 @@ package common.commercial
 import common.Edition
 import model.pressed.PressedContent
 import model.{ContentType, ImageMedia, ImageOverride}
+import play.api.Environment
 import views.support.ImgSrc
 
 case class CardContent(
@@ -18,7 +19,7 @@ case class CardContent(
 
 object CardContent {
 
-  def fromPressedContent(edition: Edition)(content: PressedContent): CardContent = {
+  def fromPressedContent(edition: Edition)(content: PressedContent)(implicit env: Environment): CardContent = {
 
     val header = content.header
 
@@ -53,7 +54,7 @@ object CardContent {
   def fromContentItem(item: ContentType,
                       edition: Edition,
                       clickMacro: Option[String],
-                      withDescription: Boolean): CardContent = {
+                      withDescription: Boolean)(implicit env: Environment): CardContent = {
     val tags = item.tags
     CardContent(
       icon = {

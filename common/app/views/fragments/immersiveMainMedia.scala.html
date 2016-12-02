@@ -6,7 +6,7 @@
 @import views.support.RenderClasses
 @import views.support.TrailCssClasses.toneClass
 
-@(page: ContentPage)(implicit request: RequestHeader)
+@(page: ContentPage)(implicit request: RequestHeader, env: play.api.Environment)
 
 @defining((
     page.item.tags.isTheMinuteArticle,

@@ -1,7 +1,7 @@
 @import model.{ContentPage, EndSlateComponents, VideoPlayer}
 @import views.support.Video640
 
-@(page: ContentPage)(implicit request: RequestHeader)
+@(page: ContentPage)(implicit request: RequestHeader, env: play.api.Environment)
 <div class="explore-video">
   <div class="gs-conatainer">
     @page.item.elements.mainVideo.map { video =>

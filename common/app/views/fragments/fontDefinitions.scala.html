@@ -1,3 +1,4 @@
+@()(implicit env: play.api.Environment)
 @List("GuardianEgyptianWeb", "GuardianTextEgyptianWeb", "GuardianSansWeb", "GuardianTextSansWeb").map { typeface =>
     <style class="webfont" data-cache-name="@typeface"
         @List("woff2", "woff", "ttf").map { font =>

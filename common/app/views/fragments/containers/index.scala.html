@@ -6,7 +6,7 @@
 @import views.html.fragments.containers.facia_cards.{date, slice}
 @import views.support.{GetClasses, PreviousAndNext}
 
-@(trails: Seq[PressedContent], containerLayout: ContainerLayout, containerIndex: Int, actualDate: DateTime, page: MetaData, nav: PreviousAndNext, tzOverride: Option[DateTimeZone] = None)(implicit request: RequestHeader, config: CollectionConfig)
+@(trails: Seq[PressedContent], containerLayout: ContainerLayout, containerIndex: Int, actualDate: DateTime, page: MetaData, nav: PreviousAndNext, tzOverride: Option[DateTimeZone] = None)(implicit request: RequestHeader, config: CollectionConfig, env: play.api.Environment)
 
 @* TODO Consolidate this with the master container template to get rid of repetition *@
 

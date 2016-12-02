@@ -3,7 +3,7 @@
 @import model.pressed.PressedContent
 @import views.support.cleanTrailText
 
-@(trail: PressedContent, rowNum: Int, related: Boolean = false, element: String = "li", headingLevel: Int = 2)(implicit request: RequestHeader)
+@(trail: PressedContent, rowNum: Int, related: Boolean = false, element: String = "li", headingLevel: Int = 2)(implicit request: RequestHeader, env: play.api.Environment)
 
 <@element class="trail trail--headline t@rowNum"
     @if(trail.discussion.isCommentable) {

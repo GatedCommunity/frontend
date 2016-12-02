@@ -1,13 +1,14 @@
 package common.commercial.hosted.hardcoded
 
 import common.commercial.hosted._
+import play.api.Environment
 
 object LegacyHostedPages {
 
   private val renaultCampaignName = "renault-car-of-the-future"
   private val galleryTestCampaignName = "hosted-gallery"
 
-  def fromCampaignAndPageName(campaignName: String, pageName: String): Option[HostedPage] = {
+  def fromCampaignAndPageName(campaignName: String, pageName: String)(implicit env: Environment): Option[HostedPage] = {
     campaignName match {
       case `renaultCampaignName` => RenaultHostedPages.fromPageName(pageName)
       case _ => None;
@@ -22,7 +23,7 @@ object HostedPages {
   private val singaporeGrandPrixCampaignName = "singapore-grand-prix"
   private val chesterZooCampaignName = "chester-zoo-act-for-wildlife"
 
-  def fromCampaignAndPageName(campaignName: String, pageName: String): Option[HostedPage] = {
+  def fromCampaignAndPageName(campaignName: String, pageName: String)(implicit env: Environment): Option[HostedPage] = {
     campaignName match {
       case `visitBritainCampaignName` => VisitBritainHostedPages.fromPageName(pageName)
       case `leffeCampaignName` => LeffeHostedPages.fromPageName(pageName)

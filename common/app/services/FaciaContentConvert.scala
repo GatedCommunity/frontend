@@ -2,12 +2,13 @@ package services
 
 import com.gu.contentapi.client.model.v1.Content
 import com.gu.facia.api.{models => fapi}
-import com.gu.facia.api.utils.{ContentProperties, ResolvedMetaData, ItemKicker}
+import com.gu.facia.api.utils.{ContentProperties, ItemKicker, ResolvedMetaData}
 import com.gu.facia.client.models.TrailMetaData
 import model.pressed.PressedContent
+import play.api.Environment
 
 object FaciaContentConvert {
-  def contentToFaciaContent(content: Content): PressedContent = {
+  def contentToFaciaContent(content: Content)(implicit env: Environment): PressedContent = {
     val frontendContent = model.Content(content)
     val trailMetaData = TrailMetaData.empty
     val cardStyle = com.gu.facia.api.utils.CardStyle(content, trailMetaData)

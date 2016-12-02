@@ -12,7 +12,7 @@
     shareInfo: Option[(Seq[model.ShareLink], String)] = None,
     amp: Boolean = false,
     doCaption: Boolean = true
-)(implicit request: RequestHeader)
+)(implicit request: RequestHeader, env: play.api.Environment)
 
 
 @defining(image_figureClasses match {

@@ -4,6 +4,9 @@ import conf.Static
 import layout.FaciaContainer
 import java.security.MessageDigest
 import java.math.BigInteger
+
+import play.api.Environment
+
 import scala.util.control.NonFatal
 
 
@@ -38,28 +41,28 @@ case class SpecialBadge(salt: String, hashedTag: String) extends BaseBadge {
 
 object Badges {
 
-  private val euSvg = Static("images/badges/eu-ref.svg")
+  private def euSvg(implicit env: Environment) = Static("images/badges/eu-ref.svg")
 
-  val usElection = Badge("us-news/us-elections-2016", Static("images/badges/us-election.png"), Some("us-election"))
-  val ausElection = Badge("australia-news/australian-election-2016", Static("images/badges/aus-election.png"), Some("aus-election"))
-  val voicesOfAmerica = Badge("us-news/series/voices-of-america", Static("images/badges/voices-of-america.svg"), Some("voices-of-america"))
+  def usElection(implicit env: Environment) = Badge("us-news/us-elections-2016", Static("images/badges/us-election.png"), Some("us-election"))
+  def ausElection(implicit env: Environment) = Badge("australia-news/australian-election-2016", Static("images/badges/aus-election.png"), Some("aus-election"))
+  def voicesOfAmerica(implicit env: Environment) = Badge("us-news/series/voices-of-america", Static("images/badges/voices-of-america.svg"), Some("voices-of-america"))
 
-  val euElection = Badge("politics/eu-referendum", euSvg)
-  val euRealityCheck = Badge("politics/series/eu-referendum-reality-check", euSvg)
-  val euBriefing = Badge("politics/series/eu-referendum-morning-briefing", euSvg)
-  val euSparrow = Badge("politics/series/eu-referendum-live-with-andrew-sparrow", euSvg)
+  def euElection(implicit env: Environment) = Badge("politics/eu-referendum", euSvg)
+  def euRealityCheck(implicit env: Environment) = Badge("politics/series/eu-referendum-reality-check", euSvg)
+  def euBriefing(implicit env: Environment) = Badge("politics/series/eu-referendum-morning-briefing", euSvg)
+  def euSparrow(implicit env: Environment) = Badge("politics/series/eu-referendum-live-with-andrew-sparrow", euSvg)
 
-  val rio2016 = Badge("sport/rio-2016", Static("images/badges/rio-2016.svg"))
+  def rio2016(implicit env: Environment) = Badge("sport/rio-2016", Static("images/badges/rio-2016.svg"))
 
-  val nauru = Badge("news/series/nauru-files", Static("images/badges/nauru-files.svg"))
+  def nauru(implicit env: Environment) = Badge("news/series/nauru-files", Static("images/badges/nauru-files.svg"))
 
-  val allBadges = Seq(usElection, ausElection, voicesOfAmerica, nauru, rio2016, euElection, euRealityCheck, euBriefing, euSparrow)
+  def allBadges(implicit env: Environment) = Seq(usElection, ausElection, voicesOfAmerica, nauru, rio2016, euElection, euRealityCheck, euBriefing, euSparrow)
 
-  def badgeFor(c: ContentType) = {
+  def badgeFor(c: ContentType)(implicit env: Environment) = {
     badgeForTags(c.tags.tags.map(_.id))
   }
 
-  def badgeForTags(tags: Traversable[String]) = {
+  def badgeForTags(tags: Traversable[String])(implicit env: Environment) = {
 
     val badgesForTags =
       for {
@@ -70,6 +73,6 @@ object Badges {
     badgesForTags.headOption
   }
 
-  def badgeFor(fc: FaciaContainer) = badgeForTags(fc.href)
+  def badgeFor(fc: FaciaContainer)(implicit env: Environment) = badgeForTags(fc.href)
 
 }

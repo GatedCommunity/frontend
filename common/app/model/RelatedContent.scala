@@ -1,11 +1,12 @@
 package model
 
-import com.gu.contentapi.client.model.v1.{Content => ApiContent, ItemResponse}
+import com.gu.contentapi.client.model.v1.{ItemResponse, Content => ApiContent}
 import model.pressed.PressedContent
+import play.api.Environment
 import services.FaciaContentConvert
 
 object RelatedContentItem {
-  def apply(content: ApiContent) : RelatedContentItem = {
+  def apply(content: ApiContent)(implicit env: Environment) : RelatedContentItem = {
     RelatedContentItem(Content(content), FaciaContentConvert.contentToFaciaContent(content))
   }
 }
@@ -21,7 +22,7 @@ case class RelatedContent (items: Seq[RelatedContentItem]) {
 }
 
 object StoryPackages {
-  def apply(parent: ContentType, response: ItemResponse): RelatedContent = {
+  def apply(parent: ContentType, response: ItemResponse)(implicit env: Environment): RelatedContent = {
 
     val storyPackagesContent: Seq[ApiContent] = response.packages.map { packages =>
       val allContentsPerPackage: Seq[Seq[ApiContent]] = packages.map(_.articles.map(_.content))

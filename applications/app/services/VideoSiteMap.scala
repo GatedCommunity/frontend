@@ -1,7 +1,7 @@
 package services
 
 import common.{Edition, ExecutionContexts}
-import conf.Configuration
+import conf.{Configuration, Static}
 import contentapi.ContentApiClient
 import implicits.Dates.DateTime2ToCommonDateFormats
 import model.{Content, Video}

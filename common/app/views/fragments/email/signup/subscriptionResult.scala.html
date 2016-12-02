@@ -1,6 +1,6 @@
 @import model.{InvalidEmail, OtherError, Subscribed, SubscriptionResult}
 
-@(result: SubscriptionResult)
+@(result: SubscriptionResult)(implicit env: play.api.Environment)
 
 <div class="email-sub email-sub--article">
     <div class="email-sub__message">

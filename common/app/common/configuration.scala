@@ -12,7 +12,7 @@ import com.typesafe.config.ConfigException
 import conf.switches.Switches
 import conf.{Configuration, Static}
 import org.apache.commons.io.IOUtils
-import play.api.Play
+import play.api.{Environment, Play}
 
 import scala.collection.JavaConversions._
 import scala.concurrent.duration._
@@ -311,7 +311,7 @@ class GuardianConfiguration extends Logging {
 
   object images {
     lazy val path = configuration.getMandatoryStringProperty("images.path")
-    val fallbackLogo = Static("images/fallback-logo.png")
+    def fallbackLogo(implicit env: Environment) = Static("images/fallback-logo.png")
     object backends {
       lazy val mediaToken: String = configuration.getMandatoryStringProperty("images.media.token")
       lazy val staticToken: String = configuration.getMandatoryStringProperty("images.static.token")

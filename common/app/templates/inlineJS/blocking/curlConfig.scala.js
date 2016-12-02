@@ -1,4 +1,4 @@
-@()(implicit request: RequestHeader)
+@()(implicit request: RequestHeader, env: play.api.Environment)
 @import conf.Static
 @import conf.Configuration
 @import mvt.WebpackTest

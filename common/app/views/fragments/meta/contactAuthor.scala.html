@@ -1,4 +1,4 @@
-@(tags: model.Tags)
+@(tags: model.Tags)(implicit env: play.api.Environment)
 
 @tags.contributors.headOption.map { profile =>
     @profile.properties.twitterHandle.map{ twitter =>

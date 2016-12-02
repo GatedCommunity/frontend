@@ -3,6 +3,7 @@ package common.commercial.hosted.hardcoded
 import common.commercial.{Dimensions, Logo}
 import common.commercial.hosted._
 import conf.Static
+import play.api.Environment
 
 object RenaultHostedPages {
 
@@ -10,7 +11,7 @@ object RenaultHostedPages {
   private val episode1PageName = "design-competition-episode1"
   private val episode2PageName = "design-competition-episode2"
 
-  private val campaign = HostedCampaign(
+  private def campaign (implicit env: Environment) = HostedCampaign(
     id = "renault-car-of-the-future",
     name = "Discover your Renault Zoe",
     owner = "Renault",
@@ -21,7 +22,7 @@ object RenaultHostedPages {
     fontColour = Colour("#ffc421")
   )
 
-  private val cta = HostedCallToAction(
+  private def cta (implicit env: Environment) = HostedCallToAction(
     url = "https://www.renault.co.uk/vehicles/new-vehicles/zoe.html",
     label = Some("Discover Zoe"),
     image = Some(Static("images/commercial/ren_commercial_banner.jpg")),
@@ -31,7 +32,7 @@ object RenaultHostedPages {
 
   private val videoSrcRoot = "https://cdn.theguardian.tv/interactive"
 
-  private val teaserWithoutNextPage: HostedVideoPage = {
+  private def teaserWithoutNextPage (implicit env: Environment): HostedVideoPage = {
     val id = "commercial/advertiser-content/renault-car-of-the-future/design-competition-teaser"
     val pageName = teaserPageName
     val standfirst = "Who better to dream up the cars of tomorrow than the people who'll be buying them? Students at " +
@@ -77,7 +78,7 @@ object RenaultHostedPages {
     )
   }
 
-  private val episode1WithoutNextPage: HostedVideoPage = {
+  private def episode1WithoutNextPage (implicit env: Environment): HostedVideoPage = {
     val id = "commercial/advertiser-content/renault-car-of-the-future/design-competition-episode1"
     val pageName = episode1PageName
     val standfirst = "Renault challenged Central St Martins students to dream up the car of the future. The winning " +
@@ -122,7 +123,7 @@ object RenaultHostedPages {
     )
   }
 
-  private val episode2WithoutNextPage: HostedVideoPage = {
+  private def episode2WithoutNextPage (implicit env: Environment): HostedVideoPage = {
     val id = "commercial/advertiser-content/renault-car-of-the-future/design-competition-episode2"
     val pageName = episode2PageName
     val standfirst = "A group of Central St Martins students took part in a competition to dream up the car of the " +
@@ -179,13 +180,13 @@ object RenaultHostedPages {
     hostedPage.copy(nextPage = nextPage, nextVideo = nextPage)
   }
 
-  private val teaser: HostedPage = withNextPage(teaserWithoutNextPage, episode1WithoutNextPage)
+  private def teaser (implicit env: Environment): HostedPage = withNextPage(teaserWithoutNextPage, episode1WithoutNextPage)
 
-  private val episode1: HostedPage = withNextPage(episode1WithoutNextPage, episode2WithoutNextPage)
+  private def episode1 (implicit env: Environment): HostedPage = withNextPage(episode1WithoutNextPage, episode2WithoutNextPage)
 
-  private val episode2: HostedPage = withNextPage(episode2WithoutNextPage, episode1WithoutNextPage)
+  private def episode2 (implicit env: Environment): HostedPage = withNextPage(episode2WithoutNextPage, episode1WithoutNextPage)
 
-  def fromPageName(pageName: String): Option[HostedPage] = {
+  def fromPageName(pageName: String)(implicit env: Environment): Option[HostedPage] = {
     pageName match {
       case `teaserPageName` => Some(teaser)
       case `episode1PageName` => Some(episode1)

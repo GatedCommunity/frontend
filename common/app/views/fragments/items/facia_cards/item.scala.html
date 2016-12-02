@@ -1,4 +1,4 @@
-@(card: layout.FaciaCardAndIndex, containerIndex: Int, isRow: Boolean = true, isList: Boolean = false, colSpan: Int = 1)(implicit request: RequestHeader)
+@(card: layout.FaciaCardAndIndex, containerIndex: Int, isRow: Boolean = true, isList: Boolean = false, colSpan: Int = 1)(implicit request: RequestHeader, env: play.api.Environment)
 
 @import views.support.GetClasses
 @import layout.{ContentCard, HtmlBlob}

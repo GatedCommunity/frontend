@@ -1,6 +1,7 @@
 package model
 
 import conf.Static
+import play.api.Environment
 
 
 sealed trait EmailMetadata[T] extends Product with Serializable {
@@ -171,7 +172,7 @@ object EmailAddons {
       case c: ContentPage if email.isEmpty => c.item.content.seriesName
     }
 
-    lazy val banner = {
+    def banner(implicit env: Environment) = {
       val banner = email flatMap (_.banner) getOrElse defaultBanner
       Static(s"images/email/banners/$banner")
     }

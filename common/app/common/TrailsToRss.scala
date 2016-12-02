@@ -12,8 +12,9 @@ import com.sun.syndication.io.SyndFeedOutput
 import model._
 import org.joda.time.DateTime
 import org.jsoup.Jsoup
+import play.api.Environment
 import play.api.mvc.RequestHeader
-import views.support.{Profile, Item140, Item460}
+import views.support.{Item140, Item460, Profile}
 
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
@@ -36,7 +37,7 @@ object TrailsToRss extends implicits.Collections {
     image
   }
 
-  def apply(metaData: MetaData, trails: Seq[Trail])(implicit request: RequestHeader): String =
+  def apply(metaData: MetaData, trails: Seq[Trail])(implicit request: RequestHeader, env: Environment): String =
     TrailsToRss(Some(metaData.webTitle), trails, Some(metaData.url), metaData.description)
 
   def apply(title: Option[String], trails: Seq[Trail], url: Option[String] = None, description: Option[String] = None)(implicit request: RequestHeader): String = {
@@ -71,7 +72,7 @@ object TrailsToRss extends implicits.Collections {
       val readMore = s""" <a href="${trail.metadata.webUrl}">Continue reading...</a>"""
       description.setValue(stripInvalidXMLCharacters(standfirst + intro + readMore))
 
-      val mediaModules: Seq[MediaEntryModuleImpl] = for {
+      def mediaModules(implicit env: Environment): Seq[MediaEntryModuleImpl] = for {
         profile: Profile <- List(Item140, Item460)
         trailPicture: ImageMedia <- trail.trailPicture
         trailAsset: ImageAsset <- profile.elementFor(trailPicture)
@@ -107,9 +108,10 @@ object TrailsToRss extends implicits.Collections {
       entry.setLink(trail.metadata.webUrl)
       /* set http intentionally to not break existing guid */
       entry.setUri("http://www.theguardian.com/" + trail.metadata.id)
-      
+
       entry.setDescription(description)
       entry.setCategories(categories)
+      implicit val env: Environment = ???
       entry.setModules(new java.util.ArrayList(mediaModules ++ Seq(dc)))
       entry
 
@@ -124,7 +126,7 @@ object TrailsToRss extends implicits.Collections {
     writer.toString
   }
 
-  def fromPressedPage(pressedPage: PressedPage)(implicit request: RequestHeader) = {
+  def fromPressedPage(pressedPage: PressedPage)(implicit request: RequestHeader, env: Environment) = {
     val faciaContentList: List[ContentType] =
       pressedPage.collections
         .filterNot(_.config.excludeFromRss)
@@ -145,7 +147,8 @@ object TrailsToRss extends implicits.Collections {
     fromFaciaContent(webTitle, faciaContentList, pressedPage.metadata.url, pressedPage.metadata.description)
   }
 
-  def fromFaciaContent(webTitle: String, faciaContentList: Seq[ContentType], url: String, description: Option[String] = None)(implicit request: RequestHeader): String = {
+  def fromFaciaContent(webTitle: String, faciaContentList: Seq[ContentType], url: String,
+                       description: Option[String] = None)(implicit request: RequestHeader, env: Environment): String = {
 
     // Feed
     val feed = new SyndFeedImpl
@@ -178,7 +181,7 @@ object TrailsToRss extends implicits.Collections {
       val readMore = s""" <a href="$webUrl">Continue reading...</a>"""
       description.setValue(stripInvalidXMLCharacters(standfirst + intro + readMore))
 
-      val mediaModules: Seq[MediaEntryModuleImpl] = for {
+      def mediaModules(implicit env: Environment): Seq[MediaEntryModuleImpl] = for {
         profile: Profile <- List(Item140, Item460)
         trailPicture: ImageMedia <- faciaContent.trail.trailPicture
         trailAsset: ImageAsset <- profile.elementFor(trailPicture)

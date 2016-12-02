@@ -1,4 +1,4 @@
-@(item: model.ContentType)(implicit request: RequestHeader)
+@(item: model.ContentType)(implicit request: RequestHeader, env: play.api.Environment)
 @import model._
 
 @byline() = {

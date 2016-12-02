@@ -1,7 +1,8 @@
 package model
 
 import com.gu.contentapi.client.model.v1.Asset
-import views.support.{Orientation, Naked, ImgSrc}
+import play.api.Environment
+import views.support.{ImgSrc, Naked, Orientation}
 
 object Helpers {
   def assetFieldsToMap(asset: Asset): Map[String, String] =
@@ -48,10 +49,10 @@ case class ImageAsset(
   mimeType: Option[String],
   url: Option[String]) {
 
-  lazy val path: Option[String] = url.map(ImgSrc(_, Naked))
+  def path(implicit env: Environment): Option[String] = url.map(ImgSrc(_, Naked))
 
   val thumbnail: Option[String] = fields.get("thumbnail")
-  val thumbnailPath: Option[String] = thumbnail.map(ImgSrc(_, Naked))
+  def thumbnailPath(implicit env: Environment): Option[String] = thumbnail.map(ImgSrc(_, Naked))
 
   val width: Int = fields.get("width").map(_.toInt).getOrElse(1)
   val height: Int = fields.get("height").map(_.toInt).getOrElse(1)

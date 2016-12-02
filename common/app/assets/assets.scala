@@ -41,11 +41,11 @@ class Assets(base: String, mapResource: String, useHashedBundles: Boolean = Conf
 }
 
 // turns a readable CSS class into a list of rules in short form from the atomic css file
-class CssMap(mapResource: String)(implicit env: Environment) extends Logging {
+class CssMap(mapResource: String) extends Logging {
 
-  lazy val lookup: Map[String, List[String]] = Get(cssMap(mapResource))
+  def lookup(implicit env: Environment): Map[String, List[String]] = Get(cssMap(mapResource))
 
-  def apply(className: String): String = {
+  def apply(className: String)(implicit env: Environment): String = {
       className + ' ' + lookup.getOrElse(className, throw CssClassNotFoundException(className)).mkString(" ")
   }
 
@@ -55,7 +55,7 @@ class CssMap(mapResource: String)(implicit env: Environment) extends Logging {
       case JsError(errors) => Failure(new Exception(s"$errors"))
     }
 
-  def cssMap(resourceName: String): Try[Map[String, List[String]]] = {
+  def cssMap(resourceName: String)(implicit env: Environment): Try[Map[String, List[String]]] = {
     for {
       rawResource <- LoadFromClasspath(resourceName)
       mappings <- jsonToAssetMap(rawResource)

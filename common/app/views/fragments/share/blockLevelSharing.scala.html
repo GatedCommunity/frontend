@@ -1,4 +1,4 @@
-@(id: String, shareItems: Seq[model.ShareLink], contentType: String, isNewGallery: Boolean = false, amp: Boolean = false)
+@(id: String, shareItems: Seq[model.ShareLink], contentType: String, isNewGallery: Boolean = false, amp: Boolean = false)(implicit env: play.api.Environment)
 
 <div class="block-share block-share--@contentType.toLowerCase @if(!isNewGallery) { hide-on-mobile }" data-link-name="block share">
     @shareItems.map { item: model.ShareLink =>

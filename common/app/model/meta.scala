@@ -16,6 +16,7 @@ import ophan.SurgingContentAgent
 import org.apache.commons.lang3.StringUtils
 import org.joda.time.DateTime
 import org.scala_tools.time.Imports._
+import play.api.Environment
 import play.api.libs.json.{JsBoolean, JsString, JsValue}
 import play.api.mvc.RequestHeader
 
@@ -318,12 +319,12 @@ trait ContentPage extends Page {
     item.content.javascriptConfig ++
     metadata.javascriptConfigOverrides
 
-  def getOpenGraphProperties: Map[String, String] =
+  def getOpenGraphProperties(implicit env: Environment): Map[String, String] =
     metadata.opengraphProperties ++
     item.content.opengraphProperties ++
     metadata.opengraphPropertiesOverrides
 
-  def getTwitterProperties: Map[String, String] =
+  def getTwitterProperties(implicit env: Environment): Map[String, String] =
     metadata.twitterProperties ++
     item.content.twitterProperties ++
     metadata.twitterPropertiesOverrides
